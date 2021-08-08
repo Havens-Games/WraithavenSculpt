@@ -8,7 +8,7 @@ public class BuildTaskList extends BuildTask<BuildTask<?>> {
 
     @Override
     protected boolean update(BuildTask<?> t) {
-        if (!t.isRunning())
+        if (!t.isRunning() && !t.isDone())
             t.start();
 
         return false;
