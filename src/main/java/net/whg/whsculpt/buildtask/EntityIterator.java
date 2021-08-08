@@ -50,6 +50,9 @@ public class EntityIterator implements Iterator<Entity> {
 
     @Override
     public Entity get() {
+        if (index >= entities.size())
+            return null;
+
         return entities.get(index);
     }
 }

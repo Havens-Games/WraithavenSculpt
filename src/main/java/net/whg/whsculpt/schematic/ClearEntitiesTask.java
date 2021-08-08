@@ -23,6 +23,9 @@ class ClearEntitiesTask extends BuildTask<Entity> {
 
     @Override
     protected boolean update(Entity e) {
+        if (e == null)
+            return true;
+
         if (e instanceof Player)
             return true;
 
