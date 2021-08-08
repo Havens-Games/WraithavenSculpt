@@ -2,7 +2,7 @@ name: ${project.artifactId}
 main: net.whg.whsculpt.WraithavenSculpt
 version: ${project.version}
 api-version: 1.17
-depend: [WorldEdit, HavensGames-Utils]
+depend: [WorldEdit, WraithLib]
 commands:
   whsculpt:
     description: Wraithaven Sculpt commands.
