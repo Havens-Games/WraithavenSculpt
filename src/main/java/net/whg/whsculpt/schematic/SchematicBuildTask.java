@@ -1,8 +1,8 @@
 package net.whg.whsculpt.schematic;
 
 import org.bukkit.Location;
+import org.joml.Vector3i;
 
-import net.whg.utils.math.Vec3;
 import net.whg.whsculpt.buildtask.BuildTaskList;
 import net.whg.whsculpt.buildtask.EntityIterator;
 import net.whg.whsculpt.buildtask.LoadChunksTask;
@@ -49,14 +49,31 @@ public class SchematicBuildTask extends BuildTaskList {
      * @return The region iterator in chunk coordinates.
      */
     private static RegionIterator getChunkIterator(Schematic schematic, Location location) {
-        var loc = new Vec3(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        var offset = loc.subtract(schematic.getOrigin());
-        var mask = new Vec3(1, 0, 1);
+        var offset = new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        offset.sub(schematic.getOrigin());
 
-        var min = schematic.getMinimumPoint().add(offset).rBitShift(4).multiply(mask);
-        var max = schematic.getMaximumPoint().add(offset).rBitShift(4).multiply(mask);
+        var min = schematic.getMinimumPoint().add(offset, new Vector3i());
+        var max = schematic.getMaximumPoint().add(offset, new Vector3i());
+
+        blockCoordsToChunkCoords(min);
+        blockCoordsToChunkCoords(max);
+
+        var mask = new Vector3i(1, 0, 1);
+        min.mul(mask);
+        max.mul(mask);
 
         return new RegionIterator(min, max);
+    }
+
+    /**
+     * Converts a set of block coordinates to chunk coordinates.
+     * 
+     * @param pos - The world position.
+     */
+    private static void blockCoordsToChunkCoords(Vector3i pos) {
+        pos.x >>= 4;
+        pos.y >>= 4;
+        pos.z >>= 4;
     }
 
     /**
@@ -71,20 +88,33 @@ public class SchematicBuildTask extends BuildTaskList {
         var iterator = new EntityIterator();
 
         var world = location.getWorld();
-        var loc = new Vec3(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        var offset = loc.subtract(schematic.getOrigin());
+        var offset = new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        offset.sub(schematic.getOrigin());
 
-        var min = schematic.getMinimumPoint().add(offset);
-        var max = schematic.getMaximumPoint().add(offset);
+        var min = schematic.getMinimumPoint().add(offset, new Vector3i());
+        var max = schematic.getMaximumPoint().add(offset, new Vector3i());
 
         for (var entity : world.getEntities()) {
             var eLoc = entity.getLocation();
-            var entityPos = new Vec3(eLoc.getBlockX(), eLoc.getBlockY(), eLoc.getBlockZ());
-            if (entityPos.isInBounds(min, max))
+            if (isInBounds(eLoc, min, max))
                 iterator.addEntity(entity);
         }
 
         return iterator;
+    }
+
+    /**
+     * Checks if the given location is within the axis-aligned world bounds
+     * specified.
+     * 
+     * @param location - The location
+     * @param min      - The minimum world pos.
+     * @param max      - The maximum world pos.
+     * @return True if the location is in the given bounds. False otherwise.
+     */
+    private static boolean isInBounds(Location location, Vector3i min, Vector3i max) {
+        return location.getX() >= min.x && location.getX() < max.x && location.getY() >= min.y
+                && location.getY() < max.y && location.getZ() >= min.z && location.getZ() < max.z;
     }
 
     /**

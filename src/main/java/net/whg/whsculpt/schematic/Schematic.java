@@ -19,8 +19,7 @@ import com.sk89q.worldedit.math.transform.Identity;
 
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
-
-import net.whg.utils.math.Vec3;
+import org.joml.Vector3i;
 
 /**
  * Represents a loaded Minecraft schematic file.
@@ -41,9 +40,21 @@ public class Schematic {
     }
 
     private final Clipboard s;
+    private final Vector3i origin;
+    private final Vector3i minimumPoint;
+    private final Vector3i maximumPoint;
 
     private Schematic(Clipboard schematic) {
         this.s = schematic;
+
+        var clipboardOrigin = s.getOrigin();
+        origin = new Vector3i(clipboardOrigin.getX(), clipboardOrigin.getY(), clipboardOrigin.getZ());
+
+        var min = s.getMinimumPoint();
+        minimumPoint = new Vector3i(min.getX(), min.getY(), min.getZ());
+
+        var max = s.getMaximumPoint();
+        maximumPoint = new Vector3i(max.getX(), max.getY(), max.getZ());
     }
 
     /**
@@ -51,9 +62,8 @@ public class Schematic {
      * 
      * @return The origin point.
      */
-    public Vec3 getOrigin() {
-        var origin = s.getOrigin();
-        return new Vec3(origin.getX(), origin.getY(), origin.getZ());
+    public Vector3i getOrigin() {
+        return origin;
     }
 
     /**
@@ -61,9 +71,8 @@ public class Schematic {
      * 
      * @return The minimum bounds location.
      */
-    public Vec3 getMinimumPoint() {
-        var min = s.getMinimumPoint();
-        return new Vec3(min.getX(), min.getY(), min.getZ());
+    public Vector3i getMinimumPoint() {
+        return minimumPoint;
     }
 
     /**
@@ -71,9 +80,8 @@ public class Schematic {
      * 
      * @return The maximum bounds location.
      */
-    public Vec3 getMaximumPoint() {
-        var max = s.getMaximumPoint();
-        return new Vec3(max.getX(), max.getY(), max.getZ());
+    public Vector3i getMaximumPoint() {
+        return maximumPoint;
     }
 
     /**
@@ -82,7 +90,7 @@ public class Schematic {
      * @param pos - The block position.
      * @return The block data.
      */
-    public BlockData getBlockData(Vec3 pos) {
+    public BlockData getBlockData(Vector3i pos) {
         var targetBlock = s.getFullBlock(BlockVector3.at(pos.x, pos.y, pos.z));
         return BukkitAdapter.adapt(targetBlock);
     }
@@ -96,10 +104,10 @@ public class Schematic {
      */
     public void spawnEntities(Location location) {
         var world = BukkitAdapter.adapt(location.getWorld());
-        var origin = s.getOrigin().toVector3();
+        var clipboardOrigin = s.getOrigin().toVector3();
         var target = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-        ExtentEntityCopy entityCopy = new ExtentEntityCopy(origin, world, target.toVector3(), new Identity());
+        ExtentEntityCopy entityCopy = new ExtentEntityCopy(clipboardOrigin, world, target.toVector3(), new Identity());
         List<? extends Entity> entities = Lists.newArrayList(s.getEntities());
         EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
 

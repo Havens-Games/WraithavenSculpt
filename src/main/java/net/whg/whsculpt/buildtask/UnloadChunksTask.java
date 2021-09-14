@@ -1,10 +1,9 @@
 package net.whg.whsculpt.buildtask;
 
 import org.bukkit.World;
+import org.joml.Vector3i;
 
-import net.whg.utils.math.Vec3;
-
-public class UnloadChunksTask extends BuildTask<Vec3> {
+public class UnloadChunksTask extends BuildTask<Vector3i> {
     private final World world;
 
     public UnloadChunksTask(RegionIterator iterator, World world) {
@@ -13,7 +12,7 @@ public class UnloadChunksTask extends BuildTask<Vec3> {
     }
 
     @Override
-    protected boolean update(Vec3 pos) {
+    protected boolean update(Vector3i pos) {
         var chunk = world.getChunkAt(pos.x, pos.z);
         chunk.setForceLoaded(false);
         return false;

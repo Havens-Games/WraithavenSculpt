@@ -1,14 +1,14 @@
 package net.whg.whsculpt.buildtask;
 
-import net.whg.utils.math.Vec3;
+import org.joml.Vector3i;
 
 /**
  * Iterates over a 3D grid region in z->x->y order.
  */
-public class RegionIterator implements Iterator<Vec3> {
-    private final Vec3 min;
-    private final Vec3 max;
-    private Vec3 current;
+public class RegionIterator implements Iterator<Vector3i> {
+    private final Vector3i min;
+    private final Vector3i max;
+    private Vector3i current;
 
     /**
      * Creates a new RegionIterator.
@@ -16,7 +16,7 @@ public class RegionIterator implements Iterator<Vec3> {
      * @param min - The min region bounds.
      * @param max - The max region bounds.
      */
-    public RegionIterator(Vec3 min, Vec3 max) {
+    public RegionIterator(Vector3i min, Vector3i max) {
         this.min = min;
         this.max = max;
         current = min;
@@ -43,12 +43,12 @@ public class RegionIterator implements Iterator<Vec3> {
             }
         }
 
-        current = new Vec3(x, y, z);
+        current.set(x, y, z);
         return done;
     }
 
     @Override
-    public Vec3 get() {
+    public Vector3i get() {
         return current;
     }
 }

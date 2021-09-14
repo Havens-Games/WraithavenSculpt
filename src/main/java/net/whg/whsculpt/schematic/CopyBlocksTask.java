@@ -1,8 +1,8 @@
 package net.whg.whsculpt.schematic;
 
 import org.bukkit.Location;
+import org.joml.Vector3i;
 
-import net.whg.utils.math.Vec3;
 import net.whg.whsculpt.buildtask.BlockBuildTask;
 import net.whg.whsculpt.buildtask.RegionIterator;
 
@@ -26,7 +26,7 @@ class CopyBlocksTask extends BlockBuildTask {
 
     private final Schematic schematic;
     private final Location location;
-    private final Vec3 offset;
+    private final Vector3i offset;
 
     /**
      * Creates a new CopyBlocksTask.
@@ -39,17 +39,17 @@ class CopyBlocksTask extends BlockBuildTask {
         this.schematic = schematic;
         this.location = location;
 
-        var loc = new Vec3(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        offset = loc.subtract(schematic.getOrigin());
+        var loc = new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        offset = loc.sub(schematic.getOrigin());
     }
 
     @Override
-    protected boolean update(Vec3 pos) {
+    protected boolean update(Vector3i pos) {
         var world = location.getWorld();
-        var worldPos = pos.add(offset);
-
         var targetData = schematic.getBlockData(pos);
-        var block = world.getBlockAt(worldPos.x, worldPos.y, worldPos.z);
+        pos.add(offset);
+
+        var block = world.getBlockAt(pos.x, pos.y, pos.z);
 
         if (block.getBlockData().matches(targetData))
             return false;
